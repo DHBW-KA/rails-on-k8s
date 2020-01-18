@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hello-k8s-world
+  labels:
+    app: hello-k8s-world
+spec:
+  selector:
+    matchLabels:
+      app: hello-k8s-world
+  template:
+    metadata:
+      labels:
+        app: hello-k8s-world
+    spec:
+      containers:
+      - name: hello-k8s-world
+        image: hello-k8s-world:latest
+        ports:
+        - containerPort: 3000
+        resources:
+          limits:
+            cpu: 400m
+            memory: 1Gi
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: hello-k8s-world
+  labels:
+    app: hello-k8s-world
+spec:
+  selector:
+    app: hello-k8s-world
+  ports:
+    - name: hello-k8s-world
+      protocol: TCP
+      port: 3000
+      targetPort: 3000
+---
+kind: Ingress
+apiVersion: extensions/v1beta1
+metadata:
+  name: hello-k8s-world
+  labels:
+    app: hello-k8s-world
+spec:
+  tls:
+    - hosts:
+        - hello.example.com
+  rules:
+    - host: hello.example.com
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: hello-k8s-world
+              servicePort: 3000
